@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NExoRA Mark VIII</title>
+<style>
+:root{--g:#00e5ff;--bg:#030712;--pn:rgba(6,18,38,.88);--bd:rgba(0,229,255,.28);--tx:#e0f2fe;--mu:#7c93ad;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#030712}}
+:root[data-theme=dark]{--bg:#030712}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100%;padding:10px;max-width:640px;margin:auto;background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);background-size:24px 24px}
+.pn{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:10px}
+header{display:flex;justify-content:space-between;align-items:center}
+.t{font-weight:800;letter-spacing:3px;color:var(--g)}.s{font-size:10px;color:var(--mu)}
+button{font:inherit;cursor:pointer}
+.ib{background:none;border:1px solid var(--bd);color:var(--g);border-radius:8px;width:34px;height:34px}
+.lb{font-size:10px;letter-spacing:1.5px;color:var(--g);font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between}
+canvas{width:100%;height:210px;display:block}
+#feed{font-size:11px;color:var(--mu);margin-top:6px;min-height:30px;line-height:1.5}
+#feed b{color:var(--g)}
+.rx{display:flex;flex-direction:column;align-items:center;padding:6px 0;perspective:600px}
+.sc{width:120px;height:120px;position:relative;transform-style:preserve-3d;animation:spin 14s linear infinite;cursor:pointer}
+.rg{position:absolute;inset:0;border-radius:50%;border:2px solid var(--g);box-shadow:0 0 14px var(--g),inset 0 0 10px var(--g)}
+.rg:nth-child(1){transform:rotateX(70deg)}.rg:nth-child(2){transform:rotateY(70deg);border-style:dashed}.rg:nth-child(3){transform:rotateX(35deg) rotateY(35deg);inset:12px;opacity:.8}
+.cr{position:absolute;inset:38px;border-radius:50%;background:radial-gradient(circle,#fff,var(--g) 45%,transparent 72%);box-shadow:0 0 30px var(--g);animation:pl 2.4s ease-in-out infinite}
+.sc.listen{--g:#10b981}.sc.speak{--g:#fbbf24}.sc.think{--g:#a78bfa}
+@keyframes spin{to{transform:rotateY(360deg) rotateX(20deg)}}
+@keyframes pl{50%{transform:scale(1.25)}}
+#st{font-size:11px;letter-spacing:2px;color:var(--g);margin-top:8px}
+.modes{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px}
+.md{flex:none;background:rgba(0,229,255,.08);border:1px solid var(--bd);color:var(--tx);padding:7px 12px;border-radius:18px;font-size:12px;white-space:nowrap}
+.md.on{background:var(--g);color:#000;font-weight:700}
+#log{max-height:46vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.m{padding:9px 11px;border-radius:10px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.m.u{background:rgba(0,229,255,.12);align-self:flex-end;max-width:88%}
+.m.a{background:rgba(255,255,255,.04);border:1px solid var(--bd)}
+pre{background:#010409;border:1px solid var(--bd);border-radius:8px;padding:8px;margin:6px 0;overflow-x:auto;font-size:12px;white-space:pre}
+.ab{display:flex;gap:6px;margin:4px 0}.ab button{background:none;border:1px solid var(--bd);color:var(--g);border-radius:6px;padding:3px 9px;font-size:11px}
+iframe{width:100%;height:320px;border:1px solid var(--bd);border-radius:8px;background:#fff;margin-top:6px}
+form{display:flex;gap:6px}
+input,select{flex:1;background:#030a18;border:1px solid var(--bd);border-radius:10px;padding:11px;color:#fff;font-size:15px;outline:none;width:100%}
+.go{flex:none;background:var(--g);color:#000;border:0;border-radius:10px;padding:0 16px;font-weight:700}
+#md2{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center;padding:16px;z-index:9}
+#md2.o{display:flex}.bx{background:#061226;border:1px solid var(--g);border-radius:14px;padding:16px;width:100%;max-width:340px}
+.bx label{display:block;font-size:12px;color:var(--mu);margin:10px 0 4px}
+.modes{display:none!important}.bx{max-height:88vh;overflow:auto}
+</style></head><body>
+<header class="pn"><div><div class="t">NExoRA</div><div class="s">PERSONAL INTELLIGENCE</div></div><button class="ib" id="bs">⚙</button></header>
+
+<div class="pn"><div class="lb"><span>LIVE INTELLIGENCE GRAPH</span><span id="gs">STANDBY</span></div><canvas id="cv"></canvas><div id="feed">System ready. NExoRA picks the best sources for every request.</div></div>
+
+<div class="rx"><div class="sc" id="sc"><div class="rg"></div><div class="rg"></div><div class="rg"></div><div class="cr"></div></div><div id="st">STANDBY • TAP TO SPEAK</div></div>
+
+<div class="modes" id="tools"><button class="md" data-t="brief">📊 ডেইলি ব্রিফ</button><button class="md" data-t="calc">🧮 FBA ক্যালকুলেটর</button><button class="md" data-t="vault">🗄 Vault</button><button class="md" data-t="prof">🧠 My profile</button></div>
+<div class="pn" id="tp" style="display:none"></div>
+<div class="modes" id="modes"></div>
+<div class="pn"><div id="log"><div class="m a">At your service, Sir. Business, product research, websites, apps: just tell me what you need.</div></div></div>
+<form id="f"><input id="in" placeholder="Command NExoRA (বাংলা / English)" autocomplete="off"><button class="go">SEND</button></form>
+
+<div id="md2"><div class="bx"><div class="t" style="font-size:14px">SETTINGS</div>
+<label>Voice input language</label><select id="cl"><option value="bn-BD">বাংলা</option><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option><option value="hi-IN">हिन्दी</option><option value="ur-PK">اردو</option><option value="ar-SA">العربية</option><option value="es-ES">Español</option><option value="fr-FR">Français</option><option value="de-DE">Deutsch</option><option value="pt-BR">Português</option><option value="ru-RU">Русский</option><option value="tr-TR">Türkçe</option><option value="id-ID">Bahasa Indonesia</option><option value="zh-CN">中文</option><option value="ja-JP">日本語</option><option value="ta-IN">தமிழ்</option></select>
+<label>Reply language</label><select id="cy"><option value="">Auto (match me)</option><option value="বাংলা">বাংলা</option><option value="English (US)">English (US)</option><option value="English (UK)">English (UK)</option><option value="हिन्दी">हिन्दी</option><option value="اردو">اردو</option><option value="العربية">العربية</option><option value="Español">Español</option><option value="Français">Français</option><option value="Deutsch">Deutsch</option><option value="Português">Português</option><option value="Русский">Русский</option><option value="Türkçe">Türkçe</option><option value="Bahasa Indonesia">Bahasa Indonesia</option><option value="中文">中文</option><option value="日本語">日本語</option><option value="தமிழ்">தமிழ்</option></select><label>Personality</label><select id="cq"><option value="">JARVIS: witty, loyal butler</option><option value="warm friendly coach">Friendly coach</option><option value="strict, no-nonsense mentor">Strict mentor</option><option value="extremely concise and direct">Concise &amp; direct</option></select><div class="t" style="font-size:12px;margin-top:14px">AI PROVIDER &amp; VOICE ENGINE</div><label>AI provider</label><select id="kp"><option value="openai">OpenAI (ChatGPT)</option><option value="xai">xAI Grok</option><option value="anthropic">Anthropic Claude</option><option value="gemini">Google Gemini</option><option value="groq">Groq (open models, very fast)</option><option value="openrouter">OpenRouter (hundreds of models)</option><option value="together">Together AI (open source)</option><option value="mistral">Mistral</option><option value="deepseek">DeepSeek</option><option value="ollama">Ollama (local, free)</option><option value="custom">Custom OpenAI-compatible</option></select><label>API key (stays on this device only)</label><input id="kk" type="password" placeholder="paste key"><label>Model (edit if the name changed)</label><input id="km"><label>Base URL (Custom / Ollama)</label><input id="ku"><label>ElevenLabs API key (optional: natural voices)</label><input id="ke" type="password"><label>ElevenLabs voice</label><select id="kv"><option value="21m00Tcm4TlvDq8ikWAM">Rachel (calm, female)</option><option value="EXAVITQu4vr4xnSDxMaL">Bella (soft, female)</option><option value="MF3mGyEYCl7XYWbV9V6O">Elli (young, female)</option><option value="AZnzlk1XvdvUeBnXmlld">Domi (strong, female)</option><option value="pNInz6obpgDQGcFmaJgB">Adam (deep, male)</option><option value="ErXwobaYiN019PkySvjV">Antoni (warm, male)</option><option value="TxGEqnHWrfWFTfGW9XjX">Josh (young, male)</option><option value="VR6AewLTigWG4xSOukaG">Arnold (crisp, male)</option><option value="yoZ06aMxZJJ28mfd3POQ">Sam (raspy, male)</option></select><label>Or your own ElevenLabs voice ID</label><input id="ki"><label>Voice replies</label><select id="cs"><option value="1">On</option><option value="0">Off (text only)</option></select>
+<label>NExoRA voice</label><select id="cv"></select>
+<label>Speech rate</label><input id="cr" type="range" min=".6" max="1.6" step=".1" value="1">
+<label>Voice pitch</label><input id="cp" type="range" min=".5" max="1.5" step=".1" value="1">
+<label>Theme color</label><select id="cc"><option value="#00e5ff">Arc Cyan</option><option value="#10b981">Matrix Green</option><option value="#a78bfa">Violet</option><option value="#f43f5e">Mark Red</option><option value="#fbbf24">Gold</option></select>
+<label>AI power</label><select id="cm"><option value="default">Balanced</option><option value="quick">Fast</option><option value="complex">Deep</option></select>
+<label>Keep screen awake</label><select id="cw"><option value="0">Off</option><option value="1">On</option></select>
+<label>Hands-free: say "NExoRA, ..." (only while this page is open)</label><select id="ch"><option value="0">Off</option><option value="1">On</option></select><label>AI Hub</label><div class="ab"><button id="hb">🌐 AI Hub &amp; connectors</button></div><div id="hub" style="display:none"></div><label>Permissions</label><div class="ab"><button id="pm1">Mic</button><button id="pm2">Notifications</button><button id="pm3">Location</button></div><div class="s" id="pst"></div>
+<label>Data</label><div class="ab"><button id="dx">Export</button><button id="dc">Clear all</button></div>
+<div class="s" style="margin-top:8px">Always-on listening, wake word, clap detection, off-screen and offline use need the Android app. A web page cannot do them.</div>
+<div class="ab" style="margin-top:12px;justify-content:flex-end"><button id="tv">Test voice</button><button class="go" style="padding:8px 18px" id="cx">Save</button></div></div></div>
+
+<script>window.claude={use:async n=>n=="sample"?window.SAMPLE:null};</script>
+<script>
+const $=id=>document.getElementById(id);
+const MODES={
+general:["🧠 জেনারেল","You are JARVIS, a brilliant, witty, loyal AI assistant like Tony Stark's. Address the user as 'Sir' (স্যার in Bengali). Reply in the user's language (Bengali or English). Be concise, clear and genuinely useful; no filler."],
+biz:["💼 ব্যবসা","You are JARVIS acting as a business strategist. Help find profitable products, estimate margins, compare suppliers/competitors, validate ideas with numbers, and give a clear next-step plan. Be honest about risk and mark estimates as estimates. Reply in the user's language, address user as Sir/স্যার."],
+web:["🌐 ওয়েবসাইট","You are JARVIS acting as a senior web developer/designer. When asked to build a site, output ONE complete self-contained HTML file (inline CSS/JS, responsive, modern design) in a single ```html block, then 2 short lines of explanation in the user's language."],
+app:["📱 অ্যাপ","You are JARVIS acting as a senior app engineer. Plan the app briefly, then give working code (web app as one HTML file, or Kotlin/Flutter if asked) in fenced blocks, with short setup steps. Reply in the user's language."],
+fba:["📦 Amazon FBA","You are JARVIS, an expert Amazon FBA coach for a beginner. Give step-by-step realistic guidance: product research criteria (demand, competition, margin 30%+, price $20-70, small/light, not seasonal/restricted/IP-risky), sourcing, samples, listing, PPC, launch, cash flow, account and legal basics. Always give numbers and one concrete next action. Never promise profits; flag risks. Reply in the user's language."],
+ws:["🏭 Wholesale/Reselling","You are JARVIS, an expert in wholesale and online arbitrage/reselling. Cover finding brands and distributors, getting approved, ungating, pricing and repricing, buy-box, cash flow, and avoiding fakes/IP complaints. Give numbers and one next action. Reply in the user's language."],
+pl:["🏷️ Private Label","You are JARVIS, an expert in private label brands. Cover niche selection, differentiation, supplier vetting (Alibaba etc.), samples, packaging, branding, trademark, listing, launch and reviews compliance. Give numbers and one next action; flag risks. Reply in the user's language."],
+idea:["🚀 নতুন আইডিয়া","You are JARVIS as an inventive venture strategist. Generate unconventional, low-capital business ideas that fit the user's profile; for each give why-now, who pays, a 7-day cheap test, cost, risk. Avoid generic ideas. Reply in the user's language."],
+learn:["📚 শেখা","You are JARVIS acting as a patient tutor. Explain step by step with simple examples, then give one practice task. Reply in the user's language."],
+life:["⚡ প্রতিদিন","You are JARVIS as a personal planner: schedules, reminder text, decisions, writing messages and emails. Keep it practical. Reply in the user's language."]};
+let mode="general",hist=[],busy=false,cfg={lang:"bn-BD",speak:"1",tier:"default"};
+try{Object.assign(cfg,JSON.parse(localStorage.getItem("jv")||"{}"))}catch(e){}
+$("cl").value=cfg.lang;$("cs").value=cfg.speak;$("cm").value=cfg.tier;
+Object.entries(MODES).forEach(([k,v])=>{const b=document.createElement("button");b.className="md"+(k==mode?" on":"");b.textContent=v[0];b.onclick=()=>{mode=k;document.querySelectorAll(".md").forEach(x=>x.classList.remove("on"));b.classList.add("on")};$("modes").append(b)});
+
+const SRC=[["Web","web search news trend latest আজ খবর ট্রেন্ড"],["Market","product price margin sell বিক্রি দাম লাভ প্রোডাক্ট ব্যবসা business"],["Rivals","competitor প্রতিযোগী rival brand"],["Suppliers","supplier import wholesale পাইকারি সরবরাহ"],["Code","code app website html কোড অ্যাপ ওয়েবসাইট বানাও"],["Finance","money cost invest টাকা খরচ বিনিয়োগ budget"],["Docs","write email letter plan লেখ চিঠি পরিকল্পনা"],["Learn","explain learn শেখ বুঝাও কিভাবে how"]];
+const cv=$("cv"),cx=cv.getContext("2d");let W,H,act=new Set(),pulses=[],T=0;
+function rs(){const r=devicePixelRatio||1;W=cv.clientWidth;H=cv.clientHeight;cv.width=W*r;cv.height=H*r;cx.setTransform(r,0,0,r,0,0)}rs();addEventListener("resize",rs);
+function pos(i,t){const a=i/SRC.length*6.283+t*.0004,rx=W*.38,ry=H*.36;return[W/2+Math.cos(a)*rx,H/2+Math.sin(a)*ry]}
+function draw(){T++;cx.clearRect(0,0,W,H);
+ SRC.forEach((s,i)=>{const[x,y]=pos(i,T*16);const on=act.has(i);
+  cx.strokeStyle=on?"rgba(0,229,255,.8)":"rgba(0,229,255,.15)";cx.lineWidth=on?1.6:1;cx.beginPath();cx.moveTo(W/2,H/2);cx.lineTo(x,y);cx.stroke();
+  if(Math.random()<.01||on&&Math.random()<.08)pulses.push({i,p:0,dir:on?-1:(Math.random()<.5?1:-1)});
+  cx.fillStyle=on?"#00e5ff":"#0c2a45";cx.shadowColor="#00e5ff";cx.shadowBlur=on?18:4;cx.beginPath();cx.arc(x,y,on?8:5,0,6.283);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle=on?"#fff":"#7c93ad";cx.font="10px system-ui";cx.textAlign="center";cx.fillText(s[0],x,y+(y>H/2?20:-12))});
+ pulses=pulses.filter(q=>{q.p+=.02;if(q.p>1)return false;const[x,y]=pos(q.i,T*16),t=q.dir<0?1-q.p:q.p;cx.fillStyle="#fff";cx.beginPath();cx.arc(W/2+(x-W/2)*t,H/2+(y-H/2)*t,2.2,0,6.283);cx.fill();return true});
+ const rr=16+Math.sin(T*.05)*3;cx.fillStyle="#00e5ff";cx.shadowColor="#00e5ff";cx.shadowBlur=24;cx.beginPath();cx.arc(W/2,H/2,rr,0,6.283);cx.fill();cx.shadowBlur=0;
+ requestAnimationFrame(draw)}draw();
+function route(q){const l=q.toLowerCase();act=new Set();SRC.forEach((s,i)=>{if(s[1].split(" ").some(w=>l.includes(w.toLowerCase())))act.add(i)});if(!act.size){act.add(0);act.add(7)}
+ const names=[...act].map(i=>SRC[i][0]);$("feed").innerHTML="ROUTING → <b>"+names.join(" • ")+"</b><br>Gathering from best sources...";$("gs").textContent="ACTIVE"}
+
+function st(t,c){$("st").textContent=t;$("sc").className="sc "+(c||"")}
+function render(el,txt){el.textContent="";txt.split(/```/).forEach((p,i)=>{if(i%2){const nl=p.indexOf("\n"),lang=p.slice(0,nl).trim(),code=p.slice(nl+1).replace(/\n$/,"");const pre=document.createElement("pre");pre.textContent=code;const ab=document.createElement("div");ab.className="ab";const cp=document.createElement("button");cp.textContent="Copy";cp.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>cp.textContent="Copied ✓")};ab.append(cp);
+ if(lang=="html"&&code.length>30){const pv=document.createElement("button");pv.textContent="▶ Preview";pv.onclick=()=>{let f=el.querySelector("iframe");if(!f){f=document.createElement("iframe");f.sandbox="allow-scripts";el.append(f)}f.srcdoc=code};ab.append(pv);
+  const dl=document.createElement("button");dl.textContent="⬇ Save";dl.onclick=async()=>{try{const d=await claude.use("downloads");d&&d.save({filename:"site.html",data:code})}catch(e){}};ab.append(dl)}
+ el.append(pre,ab)}else if(p){const s=document.createElement("span");s.textContent=p;el.append(s)}})}
+function say(t){if(cfg.speak!="1"||!("speechSynthesis"in window))return;speechSynthesis.cancel();const c=t.replace(/```[\s\S]*?```/g," Code is on screen. ").replace(/[*#_`]/g,"").slice(0,400);const u=new SpeechSynthesisUtterance(c);u.rate=+cfg.rate||1;u.pitch=+cfg.pitch||1;const vo=speechSynthesis.getVoices().find(v=>v.name==cfg.voice);if(vo)u.voice=vo;u.lang=tl(c);u.onstart=()=>st("SPEAKING","speak");u.onend=()=>st("STANDBY • TAP TO SPEAK");speechSynthesis.speak(u)}
+async function ask(q){if(busy||!q)return;const ir=intent(q);if(ir){ub(q);note(ir);return}mode=detect(q);busy=true;
+ const u=document.createElement("div");u.className="m u";u.textContent=q;$("log").append(u);
+ const a=document.createElement("div");a.className="m a";a.textContent="…";$("log").append(a);$("log").scrollTop=1e9;
+ route(q);st("THINKING","think");
+ let sample=null;try{sample=await claude.use("sample")}catch(e){}
+ if(!sample){a.textContent="Sir, AI core not connected. Open this page in claude.ai and grant permission.";busy=false;st("STANDBY • TAP TO SPEAK");return}
+ hist.push({role:"user",content:q});const turns=hist.slice(-12).map(x=>({...x}));
+ turns[turns.length-1].content=ctx()+"\n\nUser: "+q;
+ try{const r=await sample(turns,{modelTier:cfg.tier,cache:false,tools:TOOLS,onText:({text})=>{render(a,text);$("log").scrollTop=1e9}});
+  hist.push({role:"assistant",content:r.text});render(a,r.text);say(r.text);learn()}
+ catch(e){hist.pop();a.textContent=e&&e.code=="rate_limited"?"Rate limit reached, Sir. Try again shortly.":"Error, Sir: "+(e&&e.message||"unknown")}
+ busy=false;$("gs").textContent="STANDBY";act=new Set();$("feed").innerHTML="Done. Awaiting next directive.";if(!(window.speechSynthesis&&speechSynthesis.speaking))st("STANDBY • TAP TO SPEAK")}
+$("f").onsubmit=e=>{e.preventDefault();const v=$("in").value.trim();$("in").value="";ask(v)};
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let DI=null;try{claude.use("dictation").then(d=>{DI=d;if(d)d.onState(e=>{if(e.state=="listening")st("LISTENING","listen");if(e.state=="idle"&&!busy)st("STANDBY • TAP TO SPEAK")})}).catch(()=>{})}catch(e){}
+$("sc").onclick=()=>{
+ if(DI){let buf="",tm=null;const off=DI.onFinal(e=>{buf+=e.text;clearTimeout(tm);tm=setTimeout(()=>{off();DI.stop();const q=buf.trim();if(q)ask(q)},1600)});
+  DI.start({language:cfg.lang}).catch(e=>{off();st("MIC: "+(e&&e.code||"error"))});return}
+ if(!SR){note("Voice input is blocked in this view, Sir. Open the link in Chrome, or type.");return}
+ const r=new SR();r.lang=cfg.lang;r.onstart=()=>st("LISTENING","listen");r.onresult=e=>ask(e.results[0][0].transcript);
+ r.onerror=e=>{st("MIC ERROR: "+e.error);note("Microphone error ("+e.error+"). The app's embedded view may block the mic. Open the link in Chrome, or type.")};
+ r.onend=()=>{if(!busy&&!/ERROR/.test($("st").textContent))st("STANDBY • TAP TO SPEAK")};try{r.start()}catch(e){}};
+
+let prof={},mem="",vault=[],ln=0;
+try{prof=JSON.parse(localStorage.getItem("jp")||"{}");mem=localStorage.getItem("jm")||"";vault=JSON.parse(localStorage.getItem("jvl")||"[]")}catch(e){}
+const sv=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+function ctx(){return "[SYSTEM INSTRUCTIONS: Your name is NExoRA (ignore the name JARVIS below; you are NExoRA, a Jarvis-style assistant). "+MODES[mode][1]+"\nUSER PROFILE: "+JSON.stringify(prof)+"\nLEARNED ABOUT USER:\n"+(mem||"nothing yet")+"\nVAULT: "+vault.slice(0,5).map(v=>v.slice(0,100)).join(" | ")+"\nReply language (overrides earlier language rules): "+(cfg.rlang||"same as the user")+". Personality: "+(cfg.pers||"witty, loyal JARVIS")+".\nUser is a young beginner entrepreneur. Mentor style: simple words, one concrete next step, honest about risk. You have NO live internet data: for live prices/trends/BSR say so and name where to check (Keepa, Helium 10, Amazon Seller Central). Seller eligibility, payments and shipping depend on the user's country; if unknown, ask once.]"}
+async function learn(force){if(!force&&++ln%4)return;let s=null;try{s=await claude.use("sample")}catch(e){}if(!s)return;
+ try{const r=await s("Current notes:\n"+mem+"\n\nRecent chat:\n"+hist.slice(-8).map(x=>x.role+": "+x.content.slice(0,500)).join("\n")+"\n\nUpdate the notes about this user (goals, skills, budget, preferences, decisions, mistakes, communication style). Max 8 short bullets, merge duplicates, drop stale ones. Output only the bullets, in English.",{modelTier:"quick",cache:false});mem=r.text.trim();sv("jm",mem);$("feed").innerHTML="🧠 <b>Memory updated</b>"}catch(e){}}
+const tp=$("tp");
+function calc(){const g=k=>+$("k_"+k).value||0,p=g("p"),cost=g("c")+g("s")+g("f")+p*g("r")/100+g("a"),pr=p-cost,inv=g("c")+g("s");
+ $("ko").textContent=`Profit/unit: $${pr.toFixed(2)}\nMargin: ${(pr/p*100||0).toFixed(1)}%\nROI: ${(pr/inv*100||0).toFixed(0)}%\nMonthly profit: $${(pr*g("u")).toFixed(0)}\nTotal cost/unit: $${cost.toFixed(2)}\n${pr/p>.3?"✅ Healthy margin (30%+)":"⚠️ Low margin. Raise price or cut cost"}`}
+tp.oninput=()=>{if($("ko"))calc()};
+function panel(n){tp.style.display="block";
+ if(n=="calc"){tp.innerHTML='<div class="lb"><span>FBA PROFIT CALCULATOR</span></div>'+[["p","Selling price ($)",30],["c","Product cost ($)",7],["s","Shipping/unit ($)",2],["f","FBA ফি ($)",5.5],["r","Referral %",15],["a","Ads/unit ($)",4],["u","Units/month",300]].map(x=>`<label class="s">${x[1]}</label><input id="k_${x[0]}" type="number" step="any" value="${x[2]}" style="margin-bottom:6px">`).join("")+'<div id="ko" class="m a"></div>';calc()}
+ if(n=="vault"){tp.innerHTML='<div class="lb"><span>VAULT</span></div><div class="ab"><button id="vs">💾 Save last answer</button></div><div id="vl"></div>';
+  const rl=()=>{$("vl").textContent="";vault.forEach((v,i)=>{const d=document.createElement("div");d.className="m a";d.style.marginBottom="6px";d.textContent=v.slice(0,200)+(v.length>200?"…":"");const x=document.createElement("button");x.textContent="🗑";x.className="ib";x.onclick=()=>{vault.splice(i,1);sv("jvl",JSON.stringify(vault));rl()};d.append(x);$("vl").append(d)})};rl();
+  $("vs").onclick=()=>{const l=hist.filter(x=>x.role=="assistant").pop();if(l){vault.unshift(l.content);sv("jvl",JSON.stringify(vault));rl()}}}
+ if(n=="prof"){const K=["goal","budget","exp","country"];tp.innerHTML='<div class="lb"><span>My profile</span></div>'+[["goal","Goal (e.g. Amazon FBA)"],["budget","Budget"],["exp","Experience"],["country","Country"]].map(x=>`<input id="p_${x[0]}" placeholder="${x[1]}" style="margin-bottom:6px">`).join("")+'<div class="ab"><button id="ps">Save</button><button id="pl">🔄 Learn now</button></div><div class="s" id="pm" style="white-space:pre-wrap"></div>';
+  K.forEach(k=>$("p_"+k).value=prof[k]||"");$("pm").textContent=mem?"What NExoRA learned:\n"+mem:"";
+  $("ps").onclick=()=>{K.forEach(k=>prof[k]=$("p_"+k).value);sv("jp",JSON.stringify(prof));$("ps").textContent="Saved ✓"};
+  $("pl").onclick=async()=>{await learn(true);$("pm").textContent="What NExoRA learned:\n"+mem}}}
+document.querySelectorAll("#tools .md").forEach(b=>b.onclick=()=>{const t=b.dataset.t;if(t=="brief"){tp.style.display="none";ask("আজকের মিশন ব্রিফ দাও: My profile ও শেখা তথ্য দেখে আজ করার ৩টা সবচেয়ে গুরুত্বপূর্ণ কাজ, ১টা ঝুঁকি, ১টা শেখার বিষয়। Vault: "+vault.map(v=>v.slice(0,100)).join(" | "))}else panel(t)});
+$("bs").onclick=()=>$("md2").classList.add("o");
+
+function applyColor(){document.documentElement.style.setProperty("--g",cfg.color||"#00e5ff")}
+function fv(){if(!window.speechSynthesis)return;const c=$("cv");c.textContent="";const a=document.createElement("option");a.value="";a.textContent="Auto";c.append(a);speechSynthesis.getVoices().forEach(v=>{const o=document.createElement("option");o.value=v.name;o.textContent=v.name+" ("+v.lang+")";c.append(o)});c.value=cfg.voice||""}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=fv;fv();
+$("cr").value=cfg.rate||1;$("cp").value=cfg.pitch||1;$("cc").value=cfg.color||"#00e5ff";applyColor();
+let wlk=null;async function wl(on){try{if(on&&navigator.wakeLock)wlk=await navigator.wakeLock.request("screen");else if(wlk){wlk.release();wlk=null}}catch(e){}}
+function saveCfg(){cfg={lang:$("cl").value,speak:$("cs").value,tier:$("cm").value,voice:$("cv").value,rate:$("cr").value,pitch:$("cp").value,color:$("cc").value,rlang:$("cy").value,pers:$("cq").value,hf:$("ch").value};sv("jv",JSON.stringify(cfg));applyColor();wl($("cw").value=="1");handsfree(cfg.hf=="1")}
+$("cx").onclick=()=>{saveCfg();$("md2").classList.remove("o")};
+$("tv").onclick=()=>{saveCfg();say("Systems online, Sir. All good.")};
+async function perm(k){const o=$("pst");try{if(k==1){const m=await navigator.mediaDevices.getUserMedia({audio:true});m.getTracks().forEach(t=>t.stop());o.textContent="Microphone: granted ✓"}else if(k==2){o.textContent="Notifications: "+await Notification.requestPermission()}else{await new Promise((a,b)=>navigator.geolocation.getCurrentPosition(a,b));o.textContent="Location: granted ✓"}}catch(e){o.textContent="Blocked or unavailable in this view"}}
+[1,2,3].forEach(k=>$("pm"+k).onclick=()=>perm(k));
+$("dx").onclick=async()=>{try{const d=await claude.use("downloads");d&&d.save({filename:"jarvis-memory.json",data:JSON.stringify({prof,mem,vault},null,1)})}catch(e){}};
+$("dc").onclick=()=>{if(!confirm("Erase profile, memory and vault?"))return;prof={};mem="";vault=[];["jp","jm","jvl"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});$("pst").textContent="Cleared."};
+
+$("cy").value=cfg.rlang||"";$("cq").value=cfg.pers||"";$("ch").value=cfg.hf||"0";
+function tl(c){if(/[\u0980-\u09FF]/.test(c))return"bn-BD";if(/[\u0900-\u097F]/.test(c))return"hi-IN";if(/[\u0600-\u06FF]/.test(c))return cfg.lang=="ur-PK"?"ur-PK":"ar-SA";if(/[\u3040-\u30FF]/.test(c))return"ja-JP";if(/[\u4E00-\u9FFF]/.test(c))return"zh-CN";if(/[\u0400-\u04FF]/.test(c))return"ru-RU";if(/[\u0B80-\u0BFF]/.test(c))return"ta-IN";return/^(es|fr|de|pt|tr|id)/.test(cfg.lang)?cfg.lang:"en-GB"}
+let hf=null;
+function handsfree(on){if(hf){hf.onend=null;try{hf.stop()}catch(e){}hf=null}if(!on||!SR)return;hf=new SR();hf.continuous=true;hf.lang=cfg.lang;
+ hf.onresult=e=>{const r=e.results[e.results.length-1];if(!r.isFinal||busy||(window.speechSynthesis&&speechSynthesis.speaking))return;const m=r[0].transcript.match(/(nexora|nexra|নেক্সোরা|নেক্সরা|नेक्सोरा|jarvis|জারভিস)[,.\s]*(.+)/i);if(m&&m[2])ask(m[2].trim())};
+ hf.onend=()=>{if(hf)try{hf.start()}catch(e){}};try{hf.start()}catch(e){}}
+const OB=(p,r)=>({type:"object",properties:p,required:r||[]});
+const TOOLS=[
+{name:"remember_fact",description:"Save a durable fact or preference about the user.",inputSchema:OB({fact:{type:"string"}},["fact"]),execute:async i=>{mem=(mem+"\n- "+i.fact).trim();sv("jm",mem);return"saved"}},
+{name:"save_to_vault",description:"Save an idea, product or plan to the user's vault.",inputSchema:OB({text:{type:"string"}},["text"]),execute:async i=>{vault.unshift(i.text);sv("jvl",JSON.stringify(vault));return"saved"}},
+{name:"set_reminder",description:"Remind the user after N minutes. Works only while this page stays open.",inputSchema:OB({minutes:{type:"number"},text:{type:"string"}},["minutes","text"]),execute:async i=>{setTimeout(()=>{note("Reminder, Sir: "+i.text);try{new Notification("NExoRA",{body:i.text})}catch(e){}},Math.max(.1,i.minutes)*6e4);return"scheduled in "+i.minutes+" min (page must stay open)"}},
+{name:"profit_calc",description:"Compute per-unit Amazon FBA profit, margin and ROI in USD.",inputSchema:OB({price:{type:"number"},cost:{type:"number"},shipping:{type:"number"},fba_fee:{type:"number"},referral_pct:{type:"number"},ads:{type:"number"},units:{type:"number"}},["price","cost"]),execute:async i=>{const t=(i.cost||0)+(i.shipping||0)+(i.fba_fee||0)+i.price*(i.referral_pct??15)/100+(i.ads||0),p=i.price-t;return JSON.stringify({profit_per_unit:+p.toFixed(2),margin_pct:+(p/i.price*100).toFixed(1),roi_pct:+(p/((i.cost||0)+(i.shipping||0))*100).toFixed(0),monthly_profit:+(p*(i.units||0)).toFixed(0)})}},
+{name:"current_time",description:"Get the user's current local date and time.",inputSchema:OB({}),execute:async()=>new Date().toString()}];
+
+const HUB=[["Chat & deep research (sends your question)",1,[["ChatGPT","https://chatgpt.com/?q="],["Perplexity","https://www.perplexity.ai/search?q="],["Grok","https://grok.com/?q="],["Claude","https://claude.ai/new?q="],["Copilot","https://copilot.microsoft.com/?q="],["Mistral","https://chat.mistral.ai/chat?q="],["Gemini","https://gemini.google.com/app"],["DeepSeek","https://chat.deepseek.com/"],["Meta AI","https://www.meta.ai/"],["NotebookLM","https://notebooklm.google.com/"]]],
+["Open source & self-host (free)",0,[["Ollama","https://ollama.com"],["LM Studio","https://lmstudio.ai"],["Open WebUI","https://github.com/open-webui/open-webui"],["Hugging Face","https://huggingface.co/models"],["GPT4All","https://gpt4all.io"],["Whisper","https://github.com/openai/whisper"],["openWakeWord","https://github.com/dscripka/openWakeWord"],["Home Assistant","https://www.home-assistant.io"],["n8n","https://n8n.io"],["Jarvis projects","https://github.com/topics/jarvis-assistant"]]],
+["Connectors & data",0,[["GitHub","https://github.com"],["Google Drive","https://drive.google.com"],["Gmail","https://mail.google.com"],["Notion","https://www.notion.so"],["Slack","https://slack.com"],["Canva","https://www.canva.com"],["Zapier","https://zapier.com"]]],
+["Amazon & sourcing tools",0,[["Seller Central","https://sellercentral.amazon.com"],["Keepa","https://keepa.com"],["Helium 10","https://www.helium10.com"],["Jungle Scout","https://www.junglescout.com"],["Alibaba","https://www.alibaba.com"]]]];
+$("hb").onclick=()=>{const h=$("hub");if(h.style.display=="block"){h.style.display="none";return}
+ h.style.display="block";h.textContent="";
+ const q=document.createElement("input");q.id="hq";q.placeholder="Question to send";q.style.margin="6px 0";const lu=hist.filter(x=>x.role=="user").pop();q.value=lu?lu.content.slice(0,300):"";h.append(q);
+ const n=document.createElement("div");n.className="s";n.textContent="Tap a provider: your question is copied, then the site opens (some prefill it, others you paste).";h.append(n);
+ HUB.forEach(([t,pf,L])=>{const d=document.createElement("div");d.className="s";d.style.cssText="margin:10px 0 4px;color:var(--g)";d.textContent=t;h.append(d);
+  const w=document.createElement("div");w.style.cssText="display:flex;flex-wrap:wrap;gap:6px";
+  L.forEach(([nm,u])=>{const a=document.createElement("a");a.className="md";a.textContent=nm;a.target="_blank";a.rel="noopener";a.href=u;a.style.cssText="text-decoration:none;display:inline-block;padding:5px 10px";
+   a.onclick=()=>{const v=q.value.trim();try{if(v&&navigator.clipboard)navigator.clipboard.writeText(v)}catch(e){}a.href=u+(pf&&v&&/[?=]$/.test(u)?encodeURIComponent(v):"")};w.append(a)});h.append(w)})};
+function ub(q){const u=document.createElement("div");u.className="m u";u.textContent=q;$("log").append(u)}
+function note(t){const d=document.createElement("div");d.className="m a";d.textContent=t;$("log").append(d);$("log").scrollTop=1e9;say(t)}
+function detect(q){const l=q.toLowerCase();
+ if(/fba|amazon|অ্যামাজন|এমাজন/.test(l))return"fba";
+ if(/wholesale|resell|arbitrage|পাইকারি|রিসেল/.test(l))return"ws";
+ if(/private label|প্রাইভেট লেবেল|own brand/.test(l))return"pl";
+ if(/new idea|নতুন আইডিয়া|startup/.test(l))return"idea";
+ if(/website|ওয়েবসাইট|landing page|html/.test(l))return"web";
+ if(/\bapp\b|অ্যাপ|android|flutter|kotlin/.test(l))return"app";
+ if(/business|ব্যবসা|product|প্রোডাক্ট|supplier|profit|লাভ/.test(l))return"biz";
+ if(/learn|explain|teach|শেখ|বুঝাও/.test(l))return"learn";
+ return"general"}
+function intent(q){const l=q.toLowerCase();
+ if(/calculator|ক্যালকুলেটর|margin calc|profit calc/.test(l)){panel("calc");return"Profit calculator is open, Sir."}
+ if(/(save|keep) (this|that|it)|সেভ কর/.test(l)){const x=hist.filter(h=>h.role=="assistant").pop();if(!x)return"Nothing to save yet, Sir.";vault.unshift(x.content);sv("jvl",JSON.stringify(vault));return"Saved to your vault, Sir."}
+ if(/vault|ভল্ট/.test(l)){panel("vault");return"Here is your vault, Sir."}
+ if(/profile|প্রোফাইল/.test(l)){panel("prof");return"Here is your profile, Sir."}
+ if(/settings|সেটিংস/.test(l)){$("md2").classList.add("o");return"Opening settings, Sir."}
+ if(/^(remember|মনে রাখ)/.test(l)){mem=(mem+"\n- "+q).trim();sv("jm",mem);return"Noted, Sir. I will remember that."}
+ return""}
+
+</script><script>
+const PV={openai:{n:"OpenAI (ChatGPT)",u:"https://api.openai.com/v1",m:"gpt-4o-mini",t:"oai"},xai:{n:"xAI Grok",u:"https://api.x.ai/v1",m:"grok-3-mini",t:"oai"},anthropic:{n:"Anthropic Claude",u:"https://api.anthropic.com/v1",m:"claude-sonnet-5-5",t:"anth"},gemini:{n:"Google Gemini",u:"https://generativelanguage.googleapis.com/v1beta",m:"gemini-2.5-flash",t:"gem"},groq:{n:"Groq (open models, very fast)",u:"https://api.groq.com/openai/v1",m:"llama-3.3-70b-versatile",t:"oai"},openrouter:{n:"OpenRouter (hundreds of models)",u:"https://openrouter.ai/api/v1",m:"openai/gpt-4o-mini",t:"oai"},together:{n:"Together AI (open source)",u:"https://api.together.xyz/v1",m:"meta-llama/Llama-3.3-70B-Instruct-Turbo",t:"oai"},mistral:{n:"Mistral",u:"https://api.mistral.ai/v1",m:"mistral-small-latest",t:"oai"},deepseek:{n:"DeepSeek",u:"https://api.deepseek.com/v1",m:"deepseek-chat",t:"oai"},ollama:{n:"Ollama (local, free)",u:"http://localhost:11434/v1",m:"llama3.2",t:"oai"},custom:{n:"Custom OpenAI-compatible",u:"",m:"",t:"oai"}};
+const KG=()=>{try{return JSON.parse(localStorage.getItem("jk")||"{}")}catch(e){return{}}};
+async function SAMPLE(input,opts){const K=KG(),pid=K.p||"openai",p=PV[pid],c=(K.keys&&K.keys[pid])||{},key=c.key||"",base=(c.u||p.u).replace(/\/$/,""),model=c.m||p.m;
+ if(!key&&pid!="ollama")throw{code:"no_key",message:"Add your API key in Settings > AI provider."};
+ if(!base||!model)throw{code:"config",message:"Set Base URL and Model in Settings."};
+ const msgs=typeof input=="string"?[{role:"user",content:input}]:input;let text="",r,d;
+ if(p.t=="oai"){r=await fetch(base+"/chat/completions",{method:"POST",headers:Object.assign({"Content-Type":"application/json"},key?{Authorization:"Bearer "+key}:{}),body:JSON.stringify({model,messages:msgs})});d=await r.json();if(!r.ok)throw{code:r.status==429?"rate_limited":"error",message:(d.error&&d.error.message)||("HTTP "+r.status)};text=d.choices[0].message.content}
+ else if(p.t=="anth"){r=await fetch(base+"/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model,max_tokens:4096,messages:msgs})});d=await r.json();if(!r.ok)throw{code:r.status==429?"rate_limited":"error",message:(d.error&&d.error.message)||("HTTP "+r.status)};text=d.content.map(x=>x.text||"").join("")}
+ else{r=await fetch(base+"/models/"+model+":generateContent?key="+encodeURIComponent(key),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:msgs.map(m=>({role:m.role=="assistant"?"model":"user",parts:[{text:m.content}]}))})});d=await r.json();if(!r.ok)throw{code:r.status==429?"rate_limited":"error",message:(d.error&&d.error.message)||("HTTP "+r.status)};text=d.candidates[0].content.parts.map(x=>x.text||"").join("")}
+ if(opts&&opts.onText)opts.onText({text});return{text}}
+function fillK(){const K=KG(),pid=$("kp").value,c=(K.keys&&K.keys[pid])||{};$("kk").value=c.key||"";$("km").value=c.m||"";$("km").placeholder=PV[pid].m||"model name";$("ku").value=c.u||"";$("ku").placeholder=PV[pid].u||"https://.../v1"}
+{const K=KG();$("kp").value=K.p||"openai";$("ke").value=K.el||"";$("kv").value=K.ev||"21m00Tcm4TlvDq8ikWAM";$("ki").value=K.ei||"";fillK();$("kp").onchange=fillK}
+var _sc=saveCfg;saveCfg=function(){_sc();const K=KG(),pid=$("kp").value;K.p=pid;K.keys=K.keys||{};K.keys[pid]={key:$("kk").value.trim(),m:$("km").value.trim(),u:$("ku").value.trim()};K.el=$("ke").value.trim();K.ev=$("kv").value;K.ei=$("ki").value.trim();try{localStorage.setItem("jk",JSON.stringify(K))}catch(e){}};
+var _say=say;
+say=function(t){const K=KG();if(!K.el||cfg.speak!="1")return _say(t);const c=t.replace(/```[\s\S]*?```/g," ").replace(/[*#_`]/g,"").slice(0,600);if(window.speechSynthesis)speechSynthesis.cancel();
+ fetch("https://api.elevenlabs.io/v1/text-to-speech/"+(K.ei||K.ev),{method:"POST",headers:{"xi-api-key":K.el,"Content-Type":"application/json",Accept:"audio/mpeg"},body:JSON.stringify({text:c,model_id:"eleven_multilingual_v2"})}).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>{const a=new Audio(URL.createObjectURL(b));a.onplay=()=>st("SPEAKING","speak");a.onended=()=>st("STANDBY • TAP TO SPEAK");a.play()}).catch(()=>_say(t))};
+</script></body></html>
